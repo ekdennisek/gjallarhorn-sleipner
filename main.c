@@ -53,7 +53,7 @@ void twi_send_byte(uint8_t byte, uint8_t address) {
     TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
     while (!(TWCR & (1<<TWINT)));
     if ((TWSR & 0b11111000) != 0x08) {
-        snprintf(string, 49, "twi_send_byte:f1 --- TWSR = 0x%x", TWSR);
+        snprintf(string, 50, "twi_send_byte:f1 --- TWSR = 0x%x", TWSR);
         usart_send(string);
     }
 
@@ -62,7 +62,7 @@ void twi_send_byte(uint8_t byte, uint8_t address) {
     TWCR = (1<<TWINT) | (1<<TWEN);
     while (!(TWCR & (1<<TWINT)));
     if ((TWSR & 0b11111000) != 0x18) {
-        snprintf(string, 49, "twi_send_byte:f2 --- TWSR = 0x%x", TWSR);
+        snprintf(string, 50, "twi_send_byte:f2 --- TWSR = 0x%x", TWSR);
         usart_send(string);
     }
 
@@ -71,7 +71,7 @@ void twi_send_byte(uint8_t byte, uint8_t address) {
     TWCR = (1<<TWINT) | (1<<TWEN);
     while (!(TWCR & (1<<TWINT)));
     if ((TWSR & 0b11111000) != 0x28) {
-        snprintf(string, 49, "twi_send_byte:f3 --- TWSR = 0x%x", TWSR);
+        snprintf(string, 50, "twi_send_byte:f3 --- TWSR = 0x%x", TWSR);
         usart_send(string);
     }
 
