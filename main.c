@@ -3,7 +3,9 @@
 #include <util/atomic.h>
 #include <util/delay.h>
 
+#include "dac.h"
 #include "lcd.h"
+#include "spi.h"
 #include "twi.h"
 #include "usart.h"
 
@@ -33,9 +35,14 @@ enum channel_type {
     drum,
 };
 
+struct step {
+    bool enabled;
+    uint8_t note;
+};
+
 struct channel {
     enum channel_type type;
-    uint8_t steps[16];
+    struct step steps[16];
 };
 
 struct sequencer_state {
@@ -49,12 +56,14 @@ struct sequencer_state {
 void rotary_encoder_init();
 void button_pressed(struct sequencer_state* sequencer, uint8_t button);
 void button_released(struct sequencer_state* sequencer, uint8_t button);
+uint16_t note_to_cv(uint8_t note);
 
 int main() {
     usart_init();
     twi_init();
     lcd_init(PCF8574T_ADDRESS);
     rotary_encoder_init();
+    spi_init();
 
     sei();
 
@@ -67,24 +76,52 @@ int main() {
         .current_step = 0,
         .current_channel = 0,
         .channels = {
-            (struct channel) { .type = synth, .steps = { 0 } },
-            (struct channel) { .type = synth, .steps = { 0 } },
-            (struct channel) { .type = drum, .steps = { 0 } },
-            (struct channel) { .type = drum, .steps = { 0 } },
-            (struct channel) { .type = drum, .steps = { 0 } },
-            (struct channel) { .type = drum, .steps = { 0 } },
-            (struct channel) { .type = drum, .steps = { 0 } },
-            (struct channel) { .type = drum, .steps = { 0 } },
+            (struct channel) { .type = synth, .steps = { (struct step) { .enabled = false, .note = 48 } } },
+            (struct channel) { .type = synth, .steps = { (struct step) { .enabled = false, .note = 48 } } },
+            (struct channel) { .type = drum, .steps = { (struct step) { .enabled = false, .note = 48 } } },
+            (struct channel) { .type = drum, .steps = { (struct step) { .enabled = false, .note = 48 } } },
+            (struct channel) { .type = drum, .steps = { (struct step) { .enabled = false, .note = 48 } } },
+            (struct channel) { .type = drum, .steps = { (struct step) { .enabled = false, .note = 48 } } },
+            (struct channel) { .type = drum, .steps = { (struct step) { .enabled = false, .note = 48 } } },
+            (struct channel) { .type = drum, .steps = { (struct step) { .enabled = false, .note = 48 } } },
         },
     };
 
     // Setup test state
     sequencer.is_running = true;
-    sequencer.channels[0].steps[0] = 0xff;
-    sequencer.channels[0].steps[2] = 0xff;
-    sequencer.channels[0].steps[4] = 0xff;
-    sequencer.channels[0].steps[8] = 0xff;
-    sequencer.channels[0].steps[12] = 0xff;
+    sequencer.tempo = 100;
+    sequencer.channels[0].steps[0].enabled = true;
+    sequencer.channels[0].steps[0].note = 0;
+    sequencer.channels[0].steps[1].enabled = true;
+    sequencer.channels[0].steps[1].note = 0;
+    sequencer.channels[0].steps[2].enabled = true;
+    sequencer.channels[0].steps[2].note = 0;
+    sequencer.channels[0].steps[3].enabled = true;
+    sequencer.channels[0].steps[3].note = 0;
+    sequencer.channels[0].steps[4].enabled = true;
+    sequencer.channels[0].steps[4].note = 48;
+    sequencer.channels[0].steps[5].enabled = true;
+    sequencer.channels[0].steps[5].note = 48;
+    sequencer.channels[0].steps[6].enabled = true;
+    sequencer.channels[0].steps[6].note = 48;
+    sequencer.channels[0].steps[7].enabled = true;
+    sequencer.channels[0].steps[7].note = 48;
+    sequencer.channels[0].steps[8].enabled = true;
+    sequencer.channels[0].steps[8].note = 119;
+    sequencer.channels[0].steps[9].enabled = true;
+    sequencer.channels[0].steps[9].note = 119;
+    sequencer.channels[0].steps[10].enabled = true;
+    sequencer.channels[0].steps[10].note = 119;
+    sequencer.channels[0].steps[11].enabled = true;
+    sequencer.channels[0].steps[11].note = 119;
+    sequencer.channels[0].steps[12].enabled = true;
+    sequencer.channels[0].steps[12].note = 48;
+    sequencer.channels[0].steps[13].enabled = true;
+    sequencer.channels[0].steps[13].note = 48;
+    sequencer.channels[0].steps[14].enabled = true;
+    sequencer.channels[0].steps[14].note = 48;
+    sequencer.channels[0].steps[15].enabled = true;
+    sequencer.channels[0].steps[15].note = 48;
 
     // LED matrix
     DDRA = 0;
@@ -122,7 +159,7 @@ int main() {
 
                 // LED matrix
                 uint8_t step = (column * 4) + row;
-                bool step_is_active = sequencer.channels[sequencer.current_channel].steps[step] > 0;
+                bool step_is_active = sequencer.channels[sequencer.current_channel].steps[step].enabled;
                 if (
                     (step == sequencer.current_step && !step_is_active) ||
                     (step != sequencer.current_step && step_is_active)
@@ -165,6 +202,13 @@ int main() {
                 if (milliseconds > step_length_ms) {
                     sequencer.current_step = (sequencer.current_step + 1) % 16;
                     milliseconds -= step_length_ms;
+
+                    // Update CV
+                    dac_send(0, note_to_cv(sequencer.channels[0].steps[sequencer.current_step].note));
+                    dac_send(1, note_to_cv(sequencer.channels[1].steps[sequencer.current_step].note));
+                    // Update gates
+                    // TODO
+
                     snprintf(lcd_line_one, 16, "CH %02u", sequencer.current_channel + 1);
                     snprintf(lcd_line_two, 16, "STEP %02u", sequencer.current_step + 1);
                     lcd_send_lines(lcd_line_one, lcd_line_two, PCF8574T_ADDRESS);
@@ -188,5 +232,10 @@ void button_pressed(struct sequencer_state* sequencer, uint8_t button) {
 }
 
 void button_released(struct sequencer_state* sequencer, uint8_t button) {
-    sequencer->channels[sequencer->current_channel].steps[button] ^= 0xff;
+    sequencer->channels[sequencer->current_channel].steps[button].enabled ^= true;
+}
+
+uint16_t note_to_cv(uint8_t note) {
+    double voltage = ((double)note / 119.0) * 5.0;
+    return (voltage * 4095.0) / 5.0;
 }
