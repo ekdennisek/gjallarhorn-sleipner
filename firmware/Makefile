@@ -3,10 +3,6 @@ MCU_TARGET     = atmega32
 OPTIMIZE       = -O2
 CC             = avr-gcc
 OBJCOPY        = avr-objcopy
-OBJDUMP        = avr-objdump
-
-# Override is only needed by avr-lib build system.
-
 override CFLAGS        = -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) -D F_CPU=16000000UL
 
 all:
