@@ -4,6 +4,7 @@
 #include <util/delay.h>
 
 #include "dac.h"
+#include "gate.h"
 #include "lcd.h"
 #include "spi.h"
 #include "twi.h"
@@ -106,21 +107,21 @@ int main() {
     sequencer.channels[0].steps[6].note = 48;
     sequencer.channels[0].steps[7].enabled = true;
     sequencer.channels[0].steps[7].note = 48;
-    sequencer.channels[0].steps[8].enabled = true;
+    sequencer.channels[0].steps[8].enabled = false;
     sequencer.channels[0].steps[8].note = 119;
-    sequencer.channels[0].steps[9].enabled = true;
+    sequencer.channels[0].steps[9].enabled = false;
     sequencer.channels[0].steps[9].note = 119;
-    sequencer.channels[0].steps[10].enabled = true;
+    sequencer.channels[0].steps[10].enabled = false;
     sequencer.channels[0].steps[10].note = 119;
-    sequencer.channels[0].steps[11].enabled = true;
+    sequencer.channels[0].steps[11].enabled = false;
     sequencer.channels[0].steps[11].note = 119;
-    sequencer.channels[0].steps[12].enabled = true;
+    sequencer.channels[0].steps[12].enabled = false;
     sequencer.channels[0].steps[12].note = 48;
-    sequencer.channels[0].steps[13].enabled = true;
+    sequencer.channels[0].steps[13].enabled = false;
     sequencer.channels[0].steps[13].note = 48;
-    sequencer.channels[0].steps[14].enabled = true;
+    sequencer.channels[0].steps[14].enabled = false;
     sequencer.channels[0].steps[14].note = 48;
-    sequencer.channels[0].steps[15].enabled = true;
+    sequencer.channels[0].steps[15].enabled = false;
     sequencer.channels[0].steps[15].note = 48;
 
     // LED matrix
@@ -207,7 +208,10 @@ int main() {
                     dac_send(0, note_to_cv(sequencer.channels[0].steps[sequencer.current_step].note));
                     dac_send(1, note_to_cv(sequencer.channels[1].steps[sequencer.current_step].note));
                     // Update gates
-                    // TODO
+                    gate_set(SYNTH1, sequencer.channels[0].steps[sequencer.current_step].enabled);
+                    gate_set(SYNTH2, sequencer.channels[1].steps[sequencer.current_step].enabled);
+                    gate_set(DRUM1, sequencer.current_step % 2);
+                    // TODO Drum0-5
 
                     snprintf(lcd_line_one, 16, "CH %02u", sequencer.current_channel + 1);
                     snprintf(lcd_line_two, 16, "STEP %02u", sequencer.current_step + 1);
