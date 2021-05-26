@@ -6,7 +6,7 @@
 See the [TODO section](#todo)
 
 The Gjallarhorn Sleipner is an open source Eurorack compatible step sequencer. Powered by an Atmel AVR ATmega32
-running at 16 MHz, it features 2 CV/gate channels and 6 gate only channels for controlling percussion or simliar.
+running at 16 MHz, it features 2 CV/gate channels and 6 gate only channels for controlling percussion or similar.
 
 ## Programming the MCU
 
@@ -27,7 +27,17 @@ programmed.
 
 ## Technical specs
 
-TODO
+### Gates
+
+All eight gate outputs are 12 V with an output impedance of roughly 470 ohm.
+
+### Clock
+
+The clock output is 5 V. Just like the gates, its output impedance is roughly 470 ohm.
+
+### CV
+
+The two CV outputs are 0 V - 10 V and follows the 1 V per octave standard. A C4 note corresponds to 4 V.
 
 ## Usage
 
@@ -38,10 +48,10 @@ TODO
 The list below is far from an exhaustive list of what's coming, but the main features for a 1.0.0 version should all be
 listed.
 
-* Read the input state of the two special buttons, fé and úr
-* Write a usage and a technical specs section
-* Allow a user to change the channel, tempo and note of the CV channels
-* Allow a user to set gate duration as a percentage of a step
+* Documentation: Write a usage and improve the technical specs section
+* Firmware: Read the input state of the two command buttons, fé and úr
+* Firmware: Allow a user to change the channel, tempo and note of the CV channels
+* Firmware: Allow a user to set gate duration as a percentage of a step
 
 ## Changelog
 
