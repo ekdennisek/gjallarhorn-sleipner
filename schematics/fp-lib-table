@@ -1,4 +1,5 @@
 (fp_lib_table
   (lib (name mcp4922)(type KiCad)(uri ${KIPRJMOD}/mcp4922)(options "")(descr ""))
   (lib (name tlc274)(type KiCad)(uri ${KIPRJMOD}/tlc274)(options "")(descr ""))
+  (lib (name 3.5mmJack)(type KiCad)(uri ${KIPRJMOD}/3.5mmJack.pretty)(options "")(descr ""))
 )
