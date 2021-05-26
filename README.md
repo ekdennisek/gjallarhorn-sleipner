@@ -25,6 +25,10 @@ pins being used)
 Please note that you will have to connect a 16 MHz crystal to the ATmega32 in order to use it once the fuses have been
 programmed.
 
+## Technical specs
+
+TODO
+
 ## Usage
 
 TODO
@@ -34,9 +38,8 @@ TODO
 The list below is far from an exhaustive list of what's coming, but the main features for a 1.0.0 version should all be
 listed.
 
-* Create and upload PCB layout
 * Read the input state of the two special buttons, fé and úr
-* Write a usage section
+* Write a usage and a technical specs section
 * Allow a user to change the channel, tempo and note of the CV channels
 * Allow a user to set gate duration as a percentage of a step
 
